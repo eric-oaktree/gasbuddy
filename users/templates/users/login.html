@@ -1,4 +1,4 @@
-{% extends "gallery/topbar.html" %}
+{% extends "home/topbar.html" %}
 {% load bootstrap3 %}
 
 {% block content %}
@@ -16,7 +16,7 @@
   {% buttons %}
   <button class="btn btn-primary" name="submit">Log In</button>
   {% endbuttons %}
-  <input type="hidden" name="next" value="{% url 'gallery:gallery_home' %}" />
+  <input type="hidden" name="next" value="{% url 'home:home' %}" />
   </form>
 
 {% endblock content %}

@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Eric Oak Photography</title>
+    <title>Gas Buddy</title>
 
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -26,23 +26,14 @@
               data-toggle="collapse" data-target="#navbar"
               aria-expanded="false" aria-controls="navbar">
           </button>
-          <a class="navbar-brand" href="{% url 'gallery:gallery_home' %}">Eric Oak Photography</a>
+          <a class="navbar-brand" href="{% url 'home:home' %}">Gas Buddy</a>
         </div>
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            {% if user.is_authenticated %}
-            <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Private Galleries <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                {% if request.user.groups.filter(name='Lockberg').exists %}
-                <li><a href="">Lockberg</a></li>
-                {% endif %}
-              </ul>
-            </li>
-            {% endif %}
-            <li><a href="{% url 'gallery:gallery_list' %}">Gallery</a></li>
-            <li><a href="{% url 'gallery:contact' %}">Contact</a></li>
+            <li><a href="{% url 'home:home' %}">Gas</a></li>
+            <li><a href="{% url 'home:sites' %}">Sites</a></li>
+            <li><a href="{% url 'home:site_an' %}">Site Analyzer</a></li>
             {% if request.user.is_superuser %}
             <li><a href="{% url 'admin:index' %}">Admin</a></li>
             {% endif %}
