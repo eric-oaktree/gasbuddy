@@ -123,3 +123,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+if acc_keys.prod==True:
+
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': acc_keys.post_db(),
+        'USER': acc_keys.post_user(),
+        'PASSWORD': acc_keys.post_pass(),
+        'HOST': 'localhost',
+        'PORT': '',
+        }
+    }
+
+    DEBUG = False
+
+    ALLOWED_HOSTS = ['www.eve-gasbuddy.com']
