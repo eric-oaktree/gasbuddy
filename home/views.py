@@ -14,6 +14,7 @@ def sites(request):
 def site_an(request):
     return render(request, "home/site_an.html")
 
+#make superuser only
 def pull_prices(request):
     gs = Gas.objects.all()
     id_str = ''
@@ -26,6 +27,7 @@ def pull_prices(request):
 
     return render(request, "home/home.html")
 
+#make superuser only
 def wipe_db(request):
     s = Site.objects.all()
     s.delete()
@@ -43,6 +45,7 @@ def wipe_db(request):
     s.delete()
     return HttpResponseRedirect(reverse('home:home'))
 
+#make superuser only
 def setup_site(request):
     try:
         s = Setup.objects.get(id=1)
