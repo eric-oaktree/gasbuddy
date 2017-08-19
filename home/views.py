@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+import datetime, time, requests, re, os
+import bs4
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup
@@ -21,11 +23,21 @@ def pull_prices(request):
     for g in gs:
         gid = g.item_id
         id_str = id_str+'&typeid='+gid
-    r = Region.objects.get(id=1)
-    r = r.region_id
+    #r = Region.objects.get(id=1)
+    #r = r.region_id
+    r = '10000002'
     url = 'http://api.eve-central.com/api/marketstat?'+id_str+'&regionlimit='+r
-
-    return render(request, "home/home.html")
+    xml_raw = requests.get(url)
+    if xml_raw.status_code == requests.codes.ok:
+        path = 'data/prices.xml'
+        xml = open(path, 'w')
+        xml.write(xml_raw.text)
+        xml.close()
+        status = 'OK'
+    else:
+        status = 'Error'
+    context = {'status': status}
+    return render(request, "home/pull_prices.html", context)
 
 #make superuser only
 def wipe_db(request):
@@ -115,6 +127,10 @@ def setup_site(request):
         s.save()
         s = Site(name='Vital Core Reservoir',p_gas=c540,s_gas=c320,p_qty=6000,s_qty=500)
         s.save()
+        try:
+            os.mkdir('data/')
+        except:
+            pass
         s = Setup(setup=1)
         s.save()
         return HttpResponseRedirect(reverse('home:home'))
