@@ -1,0 +1,7 @@
+gas_env/
+__pycache__/
+*.sqlite3
+*.pyc
+acc_keys.py
+*.xml
+*.docx
