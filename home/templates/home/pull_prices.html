@@ -4,4 +4,23 @@
 {% block content %}
 {{ status }}
 
+<hr>
+
+<table class="table">
+  <tr>
+    <th>Name</th>
+    <th>Avg Buy (The Forge)</th>
+  </tr>
+  {% for g in gases %}
+  <tr>
+    <td>{{g.name}}</td>
+    <td>{{g.last_price}}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td>No Prices</td>
+  </tr>
+  {% endfor %}
+</table>
+
 {% endblock content %}

@@ -18,6 +18,7 @@ def site_an(request):
 
 #make superuser only
 def pull_prices(request):
+    tag_re = re.compile(r'<.*>(.*)</.*>')
     gs = Gas.objects.all()
     id_str = ''
     for g in gs:
@@ -36,7 +37,24 @@ def pull_prices(request):
         status = 'OK'
     else:
         status = 'Error'
-    context = {'status': status}
+    xml_file = open(path, 'r')
+    xml = xml_file.read()
+    soup = bs4.BeautifulSoup(xml, 'xml')
+    types = soup.find_all('type')
+    for t in types:
+        t_dict = dict(t.attrs)
+        type_id = t_dict['id']
+        buy = t.buy
+        avg = buy.find_all('avg')
+        avg_in = tag_re.search(str(avg))
+        avg_in = avg_in.group(1)
+        avg_price = float(avg_in)
+        avg_price = round(avg_price, 2)
+        g = Gas.objects.get(item_id=type_id)
+        g.last_price = avg_price
+        g.save()
+    gases = Gas.objects.all()
+    context = {'status': status, 'gases': gases}
     return render(request, "home/pull_prices.html", context)
 
 #make superuser only
