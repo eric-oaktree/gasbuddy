@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime, time, requests, re, os
 import bs4
+from django.contrib.admin.views.decorators import staff_member_required
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup
@@ -16,7 +17,7 @@ def sites(request):
 def site_an(request):
     return render(request, "home/site_an.html")
 
-#make superuser only
+@staff_member_required
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
     gs = Gas.objects.all()
@@ -57,7 +58,7 @@ def pull_prices(request):
     context = {'status': status, 'gases': gases}
     return render(request, "home/pull_prices.html", context)
 
-#make superuser only
+@staff_member_required
 def wipe_db(request):
     s = Site.objects.all()
     s.delete()
@@ -75,7 +76,7 @@ def wipe_db(request):
     s.delete()
     return HttpResponseRedirect(reverse('home:home'))
 
-#make superuser only
+@staff_member_required
 def setup_site(request):
     try:
         s = Setup.objects.get(id=1)

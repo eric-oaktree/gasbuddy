@@ -13,7 +13,7 @@ class Gas(models.Model):
 class Region(models.Model):
     name = models.TextField()
     region_id = models.TextField()
-    def __sft__(self):
+    def __str__(self):
         return self.name
 
 class Station(models.Model):
