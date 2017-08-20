@@ -21,7 +21,7 @@ class Station(models.Model):
     station_id = models.TextField()
     def __str__(self):
         return self.name
-'''
+
 class Site(models.Model):
     name = models.TextField()
     p_gas = models.ForeignKey(Gas, related_name='p_gas_re')
@@ -37,7 +37,7 @@ class Ship(models.Model):
     yld_bonus = models.DecimalField(max_digits=3,decimal_places=2)
     def __str__(self):
         return self.name
-'''
+
 class Harvester(models.Model):
     name = models.TextField()
     harv_id = models.TextField()
