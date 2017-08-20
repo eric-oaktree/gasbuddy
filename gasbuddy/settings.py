@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'home',
     'users',
-    'bootstrap3',
+    #'bootstrap3',
 
 ]
 
