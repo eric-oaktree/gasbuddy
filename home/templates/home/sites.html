@@ -34,12 +34,12 @@
     {% for key, list in sites_calc.items %}
     <tr>
       <td>{{key}}</td>
-      <td>Ƶ {{list.0|floatformat:2|intcomma}}</td>
+      <td>{{list.0|floatformat:2|intcomma}}</td>
       <td>{{list.1.name}}</td>
-      <td>Ƶ {{list.2|floatformat:2|intcomma}}</td>
+      <td>{{list.2|floatformat:2|intcomma}}</td>
       <td>{{list.3.name}}</td>
-      <td>Ƶ {{list.4|floatformat:2|intcomma}}</td>
-      <td>Ƶ {{list.5|floatformat:2|intcomma}}</td>
+      <td>{{list.4|floatformat:2|intcomma}}</td>
+      <td>{{list.5|floatformat:2|intcomma}}</td>
       <td>{{list.6|floatformat:2|intcomma}}</td>
     </tr>
     {% empty %}
