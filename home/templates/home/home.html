@@ -3,11 +3,11 @@
 {% load humanize %}
 
 {% block content %}
-<form class="form" action="{% url 'home:home' %}" method="post">
+<form class="form-inline" action="{% url 'home:home' %}" method="post">
   {% csrf_token %}
   {% bootstrap_form form %}
   {% buttons %}
-  <button name="submit" class="btn btn-primary">Enter</button>
+  <button name="submit" class="btn btn-primary">Recalculate</button>
   {% endbuttons %}
 </form>
 

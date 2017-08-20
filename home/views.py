@@ -8,7 +8,7 @@ from decimal import *
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup
-from .forms import GasForm
+from .forms import GasForm, SiteForm
 
 def home(request):
     if request.method == "POST":
@@ -48,7 +48,65 @@ def home(request):
     return render(request, "home/home.html", context)
 
 def sites(request):
-    return render(request, "home/sites.html")
+    if request.method == "POST":
+        form = SiteForm(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            harv = data['harvester']
+            cycle = Decimal(harv.cycle)
+            yld = Decimal(harv.yld)
+            ship = data['ship']
+            yld_bonus = Decimal(ship.yld_bonus)
+            if data['skill'] > 5:
+                skill = 5
+            if data['skill'] < 1:
+                skill = 1
+            else:
+                skill = data['skill']
+            cycle_bonus = skill * .05
+    else:
+        form = SiteForm()
+        cycle = Decimal(40)
+        yld = Decimal(20)
+        cycle_bonus = Decimal(0.25)
+        yld_bonus = Decimal(1)
+
+    c = cycle * (Decimal(1) - Decimal(cycle_bonus))
+    y = yld * (Decimal(1) + Decimal(yld_bonus))
+
+    sites = Site.objects.all()
+    sites_calc = {}
+    for site in sites:
+        p_price = site.p_gas.last_price
+        s_price = site.s_gas.last_price
+        p_vol = site.p_gas.volume
+        s_vol = site.s_gas.volume
+
+        p_isk_min = ((Decimal(y) / Decimal(p_vol)) * 2) * (60 / Decimal(c)) * Decimal(p_price)
+        s_isk_min = ((Decimal(y) / Decimal(s_vol)) * 2) * (60 / Decimal(c)) * Decimal(s_price)
+
+        if p_isk_min < s_isk_min:
+            best_gas = site.s_gas
+            best_gas_isk_min = s_isk_min
+            other_gas = site.p_gas
+            other_gas_isk_min = p_isk_min
+        else:
+            best_gas = site.p_gas
+            best_gas_isk_min = p_isk_min
+            other_gas = site.s_gas
+            other_gas_isk_min = s_isk_min
+
+        p_units_min = ((y / p_vol) * 2) * (60 / c)
+        s_units_min = ((y / s_vol) * 2) * (60 / c)
+        time_to_clear = (site.p_qty / p_units_min) + (site.s_qty / s_units_min)
+        isk_pres = (p_price * site.p_qty) + (s_price * site.s_qty)
+
+        site_isk_min = Decimal(isk_pres) / Decimal(time_to_clear)
+
+        sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear]
+
+    context = {'form': form, 'sites_calc': sites_calc}
+    return render(request, "home/sites.html", context)
 
 def site_an(request):
     return render(request, "home/site_an.html")
