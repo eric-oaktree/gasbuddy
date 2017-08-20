@@ -139,9 +139,9 @@ if env==True:
         }
     }
 
-    DEBUG = False
+    DEBUG = True
 
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ['www.eve-gasbuddy.com']
 
     print('Production Mode')
 
