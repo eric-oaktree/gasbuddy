@@ -139,7 +139,7 @@ if env==True:
         }
     }
 
-    DEBUG = True
+    DEBUG = False
 
     ALLOWED_HOSTS = ['www.eve-gasbuddy.com']
 
