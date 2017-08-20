@@ -119,11 +119,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+BOOTSTRAP3 = {'include_jquery': True}
+
+LOGIN_URL = '/users/login'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'
 
 if acc_keys.prod==True:
 
