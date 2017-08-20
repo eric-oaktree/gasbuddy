@@ -143,6 +143,8 @@ if env==True:
 
     ALLOWED_HOSTS = ['*']
 
+    print('Production Mode')
+
 else:
     DATABASES = {
         'default': {
@@ -150,3 +152,5 @@ else:
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
+
+    print('Dev Mode')
