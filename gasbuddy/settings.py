@@ -124,7 +124,7 @@ LOGIN_URL = '/users/login'
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static/'
 
-if acc_keys.prod==True:
+if acc_keys.prod()==True:
 
     DATABASES = {
     'default': {
