@@ -34,6 +34,8 @@ def home(request):
         cycle_bonus = 0.25
         yld_bonus = 1
 
+    if cycle_bonus > .25:
+        cycle_bonus = Decimal(0.25)
     c = cycle * (1 - cycle_bonus)
     y = yld * (1 + yld_bonus)
 
