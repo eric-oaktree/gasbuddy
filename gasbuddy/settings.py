@@ -124,7 +124,9 @@ LOGIN_URL = '/users/login'
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static/'
 
-if acc_keys.prod()==True:
+env = acc_keys.prod()
+
+if env==True:
 
     DATABASES = {
     'default': {
@@ -139,7 +141,7 @@ if acc_keys.prod()==True:
 
     DEBUG = False
 
-    ALLOWED_HOSTS = ['www.eve-gasbuddy.com']
+    ALLOWED_HOSTS = ['*']
 
 else:
     DATABASES = {
