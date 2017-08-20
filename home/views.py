@@ -4,12 +4,48 @@ from django.core.urlresolvers import reverse
 import datetime, time, requests, re, os
 import bs4
 from django.contrib.admin.views.decorators import staff_member_required
+from decimal import *
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup
+from .forms import GasForm
 
 def home(request):
-    return render(request, "home/home.html")
+    if request.method == "POST":
+        form = GasForm(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            harv = data['harvester']
+            cycle = harv.cycle
+            yld = harv.yld
+            ship = data['ship']
+            yld_bonus = ship.yld_bonus
+            if data['skill'] > 5:
+                skill = 5
+            if data['skill'] < 1:
+                skill = 1
+            else:
+                skill = data['skill']
+            cycle_bonus = skill * .05
+    else:
+        form = GasForm()
+        cycle = 40
+        yld = 20
+        cycle_bonus = 0.25
+        yld_bonus = 1
+
+    c = cycle * (1 - cycle_bonus)
+    y = yld * (1 + yld_bonus)
+
+    gases = Gas.objects.all()
+    isk_min = {}
+    for gas in gases:
+        g = gas.name
+        vol = gas.volume
+        isk_min[g] = ((Decimal(y) / Decimal(gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(gas.last_price)
+
+    context = {'isk_min': isk_min, 'form': form}
+    return render(request, "home/home.html", context)
 
 def sites(request):
     return render(request, "home/sites.html")
@@ -17,7 +53,6 @@ def sites(request):
 def site_an(request):
     return render(request, "home/site_an.html")
 
-@staff_member_required
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
     gs = Gas.objects.all()
@@ -46,10 +81,10 @@ def pull_prices(request):
         t_dict = dict(t.attrs)
         type_id = t_dict['id']
         buy = t.buy
-        avg = buy.find_all('avg')
+        avg = buy.find_all('max')
         avg_in = tag_re.search(str(avg))
         avg_in = avg_in.group(1)
-        avg_price = float(avg_in)
+        avg_price = Decimal(avg_in)
         avg_price = round(avg_price, 2)
         g = Gas.objects.get(item_id=type_id)
         g.last_price = avg_price
@@ -109,15 +144,15 @@ def setup_site(request):
         s.save()
         s = Ship(name='Prospect',cargo=10000,cycle_bonus=0.05,yld_bonus=1.00)
         s.save()
-        h = Harvester(name='Gas Cloud Harvester I',harv_id='25266',cycle=30,yld=20)
+        h = Harvester(name='Gas Cloud Harvester I',harv_id='25266',cycle=30,yld=10)
         h.save()
-        h = Harvester(name='\'Crop\' Gas Cloud Harvester',harv_id='25540',cycle=30,yld=20)
+        h = Harvester(name='\'Crop\' Gas Cloud Harvester',harv_id='25540',cycle=30,yld=10)
         h.save()
-        h = Harvester(name='\'Plow\' Gas Cloud Harvester',harv_id='25542',cycle=30,yld=20)
+        h = Harvester(name='\'Plow\' Gas Cloud Harvester',harv_id='25542',cycle=30,yld=10)
         h.save()
-        h = Harvester(name='Gas Cloud Harvester II',harv_id='25812',cycle=40,yld=30)
+        h = Harvester(name='Gas Cloud Harvester II',harv_id='25812',cycle=40,yld=20)
         h.save()
-        h = Harvester(name='Syndicate Gas Cloud Harvester',harv_id='28788',cycle=30,yld=20)
+        h = Harvester(name='Syndicate Gas Cloud Harvester',harv_id='28788',cycle=30,yld=10)
         h.save()
         c50 = Gas.objects.get(name='Fullerite-C50')
         c60 = Gas.objects.get(name='Fullerite-C60')

@@ -34,7 +34,6 @@ class Site(models.Model):
 class Ship(models.Model):
     name = models.TextField()
     cargo = models.IntegerField()
-    cycle_bonus = models.DecimalField(max_digits=3,decimal_places=2)
     yld_bonus = models.DecimalField(max_digits=3,decimal_places=2)
     def __str__(self):
         return self.name

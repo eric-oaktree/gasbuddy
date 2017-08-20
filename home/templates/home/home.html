@@ -1,7 +1,33 @@
 {% extends "home/topbar.html" %}
 {% load bootstrap3 %}
+{% load humanize %}
 
 {% block content %}
-content
+<form class="form" action="{% url 'home:home' %}" method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+  <button name="submit" class="btn btn-primary">Enter</button>
+  {% endbuttons %}
+</form>
+
+<hr>
+
+<table class="table">
+  <tr>
+    <th>Gas</th>
+    <th>ISK per Minute</th>
+  </tr>
+  {% for key, value in isk_min.items %}
+  <tr>
+    <td>{{key}}</td>
+    <td>${{value|floatformat:2|intcomma}}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td>Something went wrong</td>
+  </tr>
+  {% endfor %}
+</table>
 
 {% endblock content %}
