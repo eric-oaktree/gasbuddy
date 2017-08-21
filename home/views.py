@@ -117,7 +117,8 @@ def sites(request):
 
         sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear]
 
-    context = {'form': form, 'sites_calc': sites_calc}
+    u = APICheck.objects.get(id=1)
+    context = {'form': form, 'sites_calc': sites_calc, 'updated': str(u.updated)}
     return render(request, "home/sites.html", context)
 
 def site_an(request):
