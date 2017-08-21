@@ -48,3 +48,6 @@ class Harvester(models.Model):
 
 class Setup(models.Model):
     setup = models.IntegerField(default=0)
+
+class APICheck(models.Model):
+    updated = models.DateTimeField(auto_now=True)

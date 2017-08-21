@@ -7,7 +7,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from decimal import *
 
 # Create your views here.
-from .models import Gas, Region, Station, Site, Ship, Harvester, Setup
+from .models import Gas, Region, Station, Site, Ship, Harvester, Setup, APICheck
 from .forms import GasForm, SiteForm
 
 def home(request):
@@ -46,7 +46,9 @@ def home(request):
         vol = gas.volume
         isk_min[g] = ((Decimal(y) / Decimal(gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(gas.last_price)
 
-    context = {'isk_min': isk_min, 'form': form}
+    u = APICheck.objects.get(id=1)
+
+    context = {'isk_min': isk_min, 'form': form, 'updated': str(u.updated)}
     return render(request, "home/home.html", context)
 
 def sites(request):
@@ -155,6 +157,8 @@ def pull_prices(request):
         g.last_price = avg_price
         g.save()
     gases = Gas.objects.all()
+    a, c = APICheck.objects.get_or_create(id=1)
+    a.save()
     context = {'status': status, 'gases': gases}
     return render(request, "home/pull_prices.html", context)
 
