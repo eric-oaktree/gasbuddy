@@ -9,10 +9,34 @@
 
 <form class="form-inline" action="{% url 'home:sites' %}" method="post">
   {% csrf_token %}
-  {% bootstrap_form form %}
-  {% buttons %}
-  <button name="submit" class="btn btn-primary">Recalculate</button>
-  {% endbuttons %}
+  {{ form.non_field_errors }}
+  <div class="container-fluid text-center">
+    <div class="fieldWrapper form-group">
+      {{ form.num.errors }}
+      <label for="{{ form.subject.id_for_label }}">Number of Ships:</label>
+      {{ form.num }}
+    </div>
+    <div class="fieldWrapper form-group">
+      {{ form.ship.errors }}
+      <label class="sr-only" for="{{ form.subject.id_for_label }}">Ship:</label>
+      {{ form.ship }}
+    </div>
+    <div class="fieldWrapper form-group">
+      {{ form.harvester.errors }}
+      <label class="sr-only" for="{{ form.subject.id_for_label }}">Harvester:</label>
+      {{ form.harvester }}
+    </div>
+    <div class="fieldWrapper form-group">
+      {{ form.skill.errors }}
+      <label for="{{ form.subject.id_for_label }}">Mining Frigate:</label>
+      {{ form.skill }}
+    </div>
+
+      {% buttons %}
+      <button name="submit" class="btn btn-primary">Recalculate</button>
+      {% endbuttons %}
+
+  </div>
 </form>
 
 <p></p>

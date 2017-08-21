@@ -8,7 +8,7 @@
 <script type="text/javascript" src="{% static 'home/sorttable.js' %}"></script>
 <link rel="stylesheet" href="{% static 'home/tables.css' %}">
 
-
+<div class="container-fluid text-center">
 <form class="form-inline" action="{% url 'home:home' %}" method="post">
   {% csrf_token %}
   {% bootstrap_form form %}
@@ -16,6 +16,7 @@
   <button name="submit" class="btn btn-primary">Recalculate</button>
   {% endbuttons %}
 </form>
+</div>
 
 <p></p>
 
