@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^setup_site/$', views.setup_site, name='setup_site'),
     url(r'^pull_prices/$', views.pull_prices, name='pull_prices'),
     url(r'^wipe_db/$', views.wipe_db, name='wipe_db'),
+    url(r'^about/$', views.about, name='about'),
     url(r'^$', views.home, name='home'),
 ]

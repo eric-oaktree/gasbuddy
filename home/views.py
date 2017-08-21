@@ -10,6 +10,9 @@ from decimal import *
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup, APICheck
 from .forms import GasForm, SiteForm
 
+def about(request):
+    return render(request, 'home/about.html')
+
 def home(request):
     if request.method == "POST":
         form = GasForm(data=request.POST)

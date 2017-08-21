@@ -45,6 +45,7 @@
             <li><a href="{% url 'home:home' %}">Gas</a></li>
             <li><a href="{% url 'home:sites' %}">Sites</a></li>
             <li><a href="{% url 'home:site_an' %}">Site Analyzer</a></li>
+            <li><a href="{% url 'home:about' %}">About</a></li>
             {% if request.user.is_superuser %}
             <li><a href="{% url 'admin:index' %}">Admin</a></li>
             {% endif %}
