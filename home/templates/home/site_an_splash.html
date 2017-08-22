@@ -1,0 +1,14 @@
+{% extends "home/topbar.html" %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="container-fluid text-center">
+<form class="form-inline" action="{% url 'home:home' %}" method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+  <button name="submit" class="btn btn-primary">Calculate</button>
+  {% endbuttons %}
+</form>
+</div>
+{% endblock content %}

@@ -4,6 +4,7 @@ from django.contrib.auth.views import login
 from . import views
 
 urlpatterns = [
+    url(r'^site_an_splash/$', views.site_an_splash, name='site_an_splash'),
     url(r'^site_an/$', views.site_an, name='site_an'),
     url(r'^sites/$', views.sites, name='sites'),
     url(r'^setup_site/$', views.setup_site, name='setup_site'),

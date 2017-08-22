@@ -124,6 +124,17 @@ def sites(request):
 def site_an(request):
     return render(request, "home/site_an.html")
 
+def site_an_splash(request):
+    if request.method == "POST":
+        form = SiteAnalyzer(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            #do something with data
+    else:
+        form = SiteAnalyzer
+    context = {'form': form}
+    return render(request, 'home/site_an_splash.html', context)
+
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
     gs = Gas.objects.all()
