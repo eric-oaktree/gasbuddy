@@ -47,7 +47,9 @@ def home(request):
     for gas in gases:
         g = gas.name
         vol = gas.volume
-        isk_min[g] = ((Decimal(y) / Decimal(gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(gas.last_price)
+         isk_min_val = ((Decimal(y) / Decimal(gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(gas.last_price)
+         isk_mthree = Decimal(gas.last_price) / Decimal(gas.volume))
+         isk_min[g] = [isk_min_val, isk_mthree]
 
     u = APICheck.objects.get(id=1)
 

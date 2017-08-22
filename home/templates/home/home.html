@@ -24,6 +24,7 @@
     <thead>
     <tr>
       <th class="text-center">Gas</th>
+      <th class="text-center">ISK per m3</th>
       <th class="text-center">ISK per Minute</th>
     </tr>
   </thead>
@@ -31,7 +32,8 @@
     {% for key, value in isk_min.items %}
     <tr>
       <td>{{key}}</td>
-      <td>{{value|floatformat:2|intcomma}}</td>
+      <td>{{value.1|floatformat:2|intcomma}}</td>
+      <td>{{value.0|floatformat:2|intcomma}}</td>
     </tr>
     {% empty %}
     <tr>
