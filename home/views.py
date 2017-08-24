@@ -122,6 +122,12 @@ def sites(request):
     return render(request, "home/sites.html", context)
 
 def site_an(request):
+    if request.method == 'POST':
+        form = SiteAnalysis(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+    else:
+        form = SiteAnalysis
     return render(request, "home/site_an.html")
 
 def site_an_splash(request):
