@@ -142,20 +142,24 @@ def site_an(request):
         form = SiteAnalysis(data=request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            scan = data['scan']
+            num = Decimal(data['num'])
+            ship = data['ship']
+            harvester = data['harvester']
+            skill = Decimal(data['skill'])
+            show_data = True
     else:
         form = SiteAnalysis
-    return render(request, "home/site_an.html")
+        show_data = False
 
-def site_an_splash(request):
-    if request.method == "POST":
-        form = SiteAnalyzer(data=request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            #do something with data
-    else:
-        form = SiteAnalyzer
-    context = {'form': form}
-    return render(request, 'home/site_an_splash.html', context)
+    #parse Dscan
+
+    #ninja scanning
+
+    #site clearing
+
+    context = {'show_data': show_data, 'form': form}
+    return render(request, "home/site_an.html")
 
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
