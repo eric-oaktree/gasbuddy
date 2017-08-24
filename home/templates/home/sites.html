@@ -31,6 +31,11 @@
       <label for="{{ form.subject.id_for_label }}">Mining Frigate:</label>
       {{ form.skill }}
     </div>
+    <div class="fieldWrapper form-group">
+      {{ form.extra_data.errors }}
+      <label for="{{ form.subject.id_for_label }}">Extra Data:</label>
+      {{ form.extra_data }}
+    </div>
 
       {% buttons %}
       <button name="submit" class="btn btn-primary">Recalculate</button>
@@ -48,10 +53,19 @@
       <th class="text-center">ISK Present</th>
       <th class="text-center">Best Cloud</th>
       <th class="text-center">Best Cloud ISK per Minute</th>
+      {% if extra_data == True %}
+      <th class="text-center">Best Cloud Time to Clear</th>
+      {% endif %}
       <th class="text-center">Secondary Cloud</th>
       <th class="text-center">Secondary Cloud ISK per Minute</th>
+      {% if extra_data == True %}
+      <th class="text-center">Secondary Cloud Time to Clear</th>
+      {% endif %}
       <th class="text-center">Site ISK per Minute</th>
       <th class="text-center">Time to Clear (Minutes)</th>
+      {% if extra_data == True %}
+      <th class="text-center">Trips/Cargo Holds Needed</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -61,10 +75,19 @@
       <td>{{list.0|floatformat:2|intcomma}}</td>
       <td>{{list.1.name}}</td>
       <td>{{list.2|floatformat:2|intcomma}}</td>
+      {% if extra_data == True %}
+      <td>{{list.7|floatformat:2|intcomma}}</td>
+      {% endif %}
       <td>{{list.3.name}}</td>
       <td>{{list.4|floatformat:2|intcomma}}</td>
+      {% if extra_data == True %}
+      <td>{{list.8|floatformat:2|intcomma}}</td>
+      {% endif %}
       <td>{{list.5|floatformat:2|intcomma}}</td>
       <td>{{list.6|floatformat:2|intcomma}}</td>
+      {% if extra_data == True %}
+      <td>{{list.9|floatformat:2|intcomma}}</td>
+      {% endif %}
     </tr>
     {% empty %}
     <tr>

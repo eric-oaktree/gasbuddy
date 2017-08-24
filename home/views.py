@@ -64,6 +64,7 @@ def sites(request):
             yld = Decimal(harv.yld)
             ship = data['ship']
             yld_bonus = Decimal(ship.yld_bonus)
+            cargo = Decimal(ship.cargo)
             num = Decimal(data['num'])
             if data['skill'] > 5:
                 skill = 5
@@ -72,6 +73,8 @@ def sites(request):
             else:
                 skill = data['skill']
             cycle_bonus = skill * .05
+
+            extra_data = data['extra_data']
 
 
 
@@ -82,6 +85,8 @@ def sites(request):
         cycle_bonus = Decimal(0.25)
         yld_bonus = Decimal(1)
         num = Decimal(1)
+        cargo = 10000
+        extra_data = False
 
     c = cycle * (Decimal(1) - Decimal(cycle_bonus))
     y = yld * (Decimal(1) + Decimal(yld_bonus))
@@ -100,25 +105,36 @@ def sites(request):
         if p_isk_min < s_isk_min:
             best_gas = site.s_gas
             best_gas_isk_min = s_isk_min
+            best_qty = site.s_qty
             other_gas = site.p_gas
             other_gas_isk_min = p_isk_min
+            other_qty = site.p_qty
         else:
             best_gas = site.p_gas
             best_gas_isk_min = p_isk_min
+            best_qty = site.p_qty
             other_gas = site.s_gas
             other_gas_isk_min = s_isk_min
+            other_qty = site.s_qty
 
-        p_units_min = ((y / p_vol) * 2) * (60 / c) * num
-        s_units_min = ((y / s_vol) * 2) * (60 / c) * num
-        time_to_clear = (site.p_qty / p_units_min) + (site.s_qty / s_units_min)
+        p_units_min = ((y / best_gas.volume) * 2) * (60 / c) * num
+        s_units_min = ((y / other_gas.volume) * 2) * (60 / c) * num
+        time_to_clear = (best_qty / p_units_min) + (other_qty / s_units_min)
         isk_pres = (p_price * site.p_qty) + (s_price * site.s_qty)
 
         site_isk_min = Decimal(isk_pres) / Decimal(time_to_clear)
 
-        sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear]
+        #extra data calculations
+        primary_time_to_clear = (best_qty / p_units_min)
+        secondary_time_to_clear = (other_qty / s_units_min)
+        #blue_loot_isk
+        #time to kill site
+        ships_needed = ((site.p_qty * p_vol) + (site.s_qty * s_vol)) / (cargo)
+
+        sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear, primary_time_to_clear, secondary_time_to_clear, ships_needed]
 
     u = APICheck.objects.get(id=1)
-    context = {'form': form, 'sites_calc': sites_calc, 'updated': str(u.updated)}
+    context = {'form': form, 'sites_calc': sites_calc, 'updated': str(u.updated), 'extra_data': extra_data}
     return render(request, "home/sites.html", context)
 
 def site_an(request):
