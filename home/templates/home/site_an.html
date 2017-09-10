@@ -1,7 +1,38 @@
 {% extends "home/topbar.html" %}
 {% load bootstrap3 %}
+{% load humanize %}
+{% load static %}
 
 {% block content %}
-Coming Soon!
-
+<div class="container-fluid text-center">
+<form class="form-inline" action="{% url 'home:site_an' %}" method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+  <button name="submit" class="btn btn-primary">Analyze</button>
+  {% endbuttons %}
+</form>
+</div>
+<div class="container-fluid">
+  <table class="table">
+    <tr>
+      <th>Site Name</th>
+      <th>Site Isk</th>
+      <th>Ninja Isk</th>
+      <th>First Cloud</th>
+    </tr>
+  {% for s in proc_sites %}
+    <tr>
+      <td>{{s.0}}</td>
+      <td>{{s.1|floatformat:2|intcomma}}</td>
+      <td>{{s.2|floatformat:2|intcomma}}</td>
+      <td>{{s.3}}</td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td>No Data</td>
+    </tr>
+  {% endfor %}
+  </table>
+</div>
 {% endblock content %}

@@ -8,7 +8,7 @@ from decimal import *
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup, APICheck
-from .forms import GasForm, SiteForm
+from .forms import GasForm, SiteForm, SiteAnalyzer
 
 def about(request):
     return render(request, 'home/about.html')
@@ -139,7 +139,7 @@ def sites(request):
 
 def site_an(request):
     if request.method == 'POST':
-        form = SiteAnalysis(data=request.POST)
+        form = SiteAnalyzer(data=request.POST)
         if form.is_valid():
             data = form.cleaned_data
             scan = data['scan']
@@ -149,17 +149,72 @@ def site_an(request):
             skill = Decimal(data['skill'])
             show_data = True
     else:
-        form = SiteAnalysis
+        form = SiteAnalyzer()
         show_data = False
+        skill = 0
+        yld = 0
+        ship = Ship.objects.get(id=1)
+        harvester = Harvester.objects.get(id=1)
+
+    cycle_bonus = skill * Decimal(0.25)
+    yld = harvester.yld
+    c = harvester.cycle * (1 - cycle_bonus)
+    y = yld * (1 + ship.yld_bonus)
 
     #parse Dscan
+    sites = []
+    proc_sites = []
+    if show_data == True:
+        #print(scan)
+        scan_re = re.compile(r'Gas Site *(\S* \S* \S*) *')
+        scan_results = scan_re.findall(scan)
+        #print(scan_results)
+        for res in scan_results:
+            sites.append(res)
 
-    #ninja scanning
+
+        for s in sites:
+            site = Site.objects.get(name=s)
+            site_name = site.name
+            site_isk = (site.p_gas.last_price * site.p_qty) + (site.s_gas.last_price * site.s_qty)
+
+            #ninja scanning
+            #determine best gas
+            p_isk_min = ((Decimal(y) / Decimal(site.p_gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(site.p_gas.last_price)
+            s_isk_min = ((Decimal(y) / Decimal(site.s_gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(site.s_gas.last_price)
+            if p_isk_min >= s_isk_min:
+                first_cloud = site.p_gas
+                first_qty = site.p_qty
+                sec_cloud = site.s_gas
+                sec_qty = site.s_qty
+            if p_isk_min <= s_isk_min:
+                first_cloud = site.s_gas
+                first_qty = site.s_qty
+                sec_cloud = site.p_gas
+                sec_qty = site.p_qty
+            #calculate how much you can get in 15 minutes
+            units_15 = ((Decimal(y) / Decimal(first_cloud.volume)) * 2) * (60 / Decimal(c)) * 15
+            print(y)
+            print(first_cloud.volume)
+            print(c)
+            if units_15 <= first_qty:
+                ninja_isk = units_15 * first_cloud.last_price
+            #if it is more than the qty in the best cloud, calculate the remaining time
+            if units_15 > first_qty:
+                min_left = 15 - (first_qty / (units_15 / 15))
+                sec_units_min = ((Decimal(y) / Decimal(sec_cloud.volume)) * 2) * (60 / Decimal(c))
+                rem_units = sec_units_min * min_left
+                ninja_isk = (rem_units * sec_cloud.last_price) + (first_qty * first_cloud.last_price)
+
+            ninja_si = (site_name, site_isk, ninja_isk, first_cloud.name)
+            print(ninja_si)
+            proc_sites.append(ninja_si)
+
+
 
     #site clearing
-
-    context = {'show_data': show_data, 'form': form}
-    return render(request, "home/site_an.html")
+    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites}
+    return render(request, "home/site_an.html", context)
 
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
