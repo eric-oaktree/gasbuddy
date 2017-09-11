@@ -156,17 +156,16 @@ def site_an(request):
         ship = Ship.objects.get(id=1)
         harvester = Harvester.objects.get(id=1)
 
-    cycle_bonus = skill * Decimal(0.25)
+    cycle_bonus = skill * Decimal(0.05)
     yld = harvester.yld
     c = harvester.cycle * (1 - cycle_bonus)
-    y = yld * (1 + ship.yld_bonus)
-
+    y = yld * (1 + ship.yld_bonus) * num
     #parse Dscan
     sites = []
     proc_sites = []
     if show_data == True:
         #print(scan)
-        scan_re = re.compile(r'Gas Site *(\S* \S* \S*) *')
+        scan_re = re.compile(r'Gas Site	*(\S* \S* \S*)	*')
         scan_results = scan_re.findall(scan)
         #print(scan_results)
         for res in scan_results:
@@ -194,9 +193,6 @@ def site_an(request):
                 sec_qty = site.p_qty
             #calculate how much you can get in 15 minutes
             units_15 = ((Decimal(y) / Decimal(first_cloud.volume)) * 2) * (60 / Decimal(c)) * 15
-            print(y)
-            print(first_cloud.volume)
-            print(c)
             if units_15 <= first_qty:
                 ninja_isk = units_15 * first_cloud.last_price
             #if it is more than the qty in the best cloud, calculate the remaining time
@@ -207,10 +203,7 @@ def site_an(request):
                 ninja_isk = (rem_units * sec_cloud.last_price) + (first_qty * first_cloud.last_price)
 
             ninja_si = (site_name, site_isk, ninja_isk, first_cloud.name)
-            print(ninja_si)
             proc_sites.append(ninja_si)
-
-
 
     #site clearing
     context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites}

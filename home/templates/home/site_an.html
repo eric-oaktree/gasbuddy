@@ -4,6 +4,10 @@
 {% load static %}
 
 {% block content %}
+
+<script type="text/javascript" src="{% static "home/sorttable.js" %}"></script>
+<link rel="stylesheet" href="{% static 'home/tables.css' %}">
+
 <div class="container-fluid text-center">
 <form class="form-inline" action="{% url 'home:site_an' %}" method="post">
   {% csrf_token %}
@@ -13,13 +17,13 @@
   {% endbuttons %}
 </form>
 </div>
-<div class="container-fluid">
-  <table class="table">
+<div class="container-fluid ">
+  <table class="table table-hover table-striped text-center sortable">
     <tr>
-      <th>Site Name</th>
-      <th>Site Isk</th>
-      <th>Ninja Isk</th>
-      <th>First Cloud</th>
+      <th class="text-center">Site Name</th>
+      <th class="text-center">Site Isk</th>
+      <th class="text-center">Ninja Isk</th>
+      <th class="text-center">First Cloud</th>
     </tr>
   {% for s in proc_sites %}
     <tr>
@@ -30,7 +34,7 @@
     </tr>
   {% empty %}
     <tr>
-      <td>No Data</td>
+      <td>Paste a scan in above!</td>
     </tr>
   {% endfor %}
   </table>
