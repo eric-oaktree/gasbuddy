@@ -171,9 +171,9 @@ def site_an(request):
         scan_re = re.compile(r'Gas Site	*(\S* \S* \S*)	*')
         scan_re_b = re.compile(r'(Instrumental Core Reservoir|Ordinary Perimeter Reservoir|Minor Perimeter Reservoir|Bountiful Frontier Reservoir|Barren Perimeter Reservoir|Token Perimeter Reservoir|Sizable Perimeter Reservoir|Vast Frontier Reservoir|Vital Core Reservoir)')
         scan_results = scan_re.findall(scan)
-        if scan_results == None:
+        if scan_results == []:
             scan_results = scan_re_b.findall(scan)
-        #print(scan_results)
+        print(scan_results)
         for res in scan_results:
             sites.append(res)
 
