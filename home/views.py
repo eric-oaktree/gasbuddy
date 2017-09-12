@@ -219,6 +219,11 @@ def site_an(request):
 
             sipm = ninja_isk / 15 / num
             nips = ninja_isk / num
+            if site_name == 'Ordinary Perimeter Reservoir':
+                sipm = 0
+                m_per_s = 0
+                nips = 0
+                ninja_isk = 0
             ninja_si = (site_name, site_isk, sipm, first_cloud.name, m_per_s, nips, ninja_isk)
             #print(ninja_si)
             proc_sites.append(ninja_si)
