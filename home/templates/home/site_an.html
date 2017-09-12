@@ -9,34 +9,79 @@
 <link rel="stylesheet" href="{% static 'home/tables.css' %}">
 
 <div class="container-fluid text-center">
-<form class="form-inline" action="{% url 'home:site_an' %}" method="post">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  {% buttons %}
-  <button name="submit" class="btn btn-primary">Analyze</button>
-  {% endbuttons %}
-</form>
+  <form class="form" action="{% url 'home:site_an' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="fieldWrapper form-group col-md-12">
+        {{ form.scan.errors }}
+        <label for="{{ form.subject.id_for_label }}">Scan:</label>
+        {{ form.scan }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="fieldWrapper form-group col-md-4">
+        {{ form.num.errors }}
+        <label for="{{ form.subject.id_for_label }}">Number of Ships:</label>
+        {{ form.num }}
+      </div>
+      <div class="fieldWrapper form-group col-md-2">
+        {{ form.ship.errors }}
+        <label for="{{ form.subject.id_for_label }}">Ship:</label>
+        {{ form.ship }}
+      </div>
+      <div class="fieldWrapper form-group col-md-3">
+        {{ form.harvester.errors }}
+        <label for="{{ form.subject.id_for_label }}">Harvester:</label>
+        {{ form.harvester }}
+      </div>
+      <div class="fieldWrapper form-group col-md-3">
+        {{ form.skill.errors }}
+        <label for="{{ form.subject.id_for_label }}">Mining Frigates Skill:</label>
+        {{ form.skill }}
+      </div>
+    </div>
+
+
+    {% buttons %}
+    <button name="submit" class="btn btn-primary">Analyze</button>
+    {% endbuttons %}
+  </form>
 </div>
 <div class="container-fluid ">
   <table class="table table-hover table-striped text-center sortable">
     <tr>
       <th class="text-center">Site Name</th>
       <th class="text-center">Site Isk</th>
-      <th class="text-center">Ninja Isk</th>
+      <th class="text-center">Ninja Isk per Ship</th>
+      <th class="text-center">Ship Isk per Minute</th>
       <th class="text-center">First Cloud</th>
+      <th class="text-center">m3 per Ship</th>
+      <th class="text-center">Isk Collected</th>
     </tr>
   {% for s in proc_sites %}
     <tr>
       <td>{{s.0}}</td>
       <td>{{s.1|floatformat:2|intcomma}}</td>
+      <td>{{s.5|floatformat:2|intcomma}}</td>
       <td>{{s.2|floatformat:2|intcomma}}</td>
       <td>{{s.3}}</td>
+      <td>{{s.4|floatformat:0|intcomma}}</td>
+      <td>{{s.6|floatformat:0|intcomma}}</td>
     </tr>
   {% empty %}
     <tr>
       <td>Paste a scan in above!</td>
     </tr>
   {% endfor %}
+  <tfoot>
+    <td><b>Totals/Averages</b></td>
+    <td>{{totals.0|floatformat:2|intcomma}}</td>
+    <td>{{totals.3|floatformat:2|intcomma}}</td>
+    <td>{{totals.1|floatformat:2|intcomma}}</td>
+    <td>{{totals.5|floatformat:1|intcomma}} Trips Needed</td>
+    <td>{{totals.2|floatformat:2|intcomma}}</td>
+    <td>{{totals.4|floatformat:2|intcomma}}</td>
+  </tfoot>
   </table>
 </div>
 {% endblock content %}

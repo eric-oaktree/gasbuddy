@@ -153,6 +153,7 @@ def site_an(request):
         show_data = False
         skill = 0
         yld = 0
+        num = 1
         ship = Ship.objects.get(id=1)
         harvester = Harvester.objects.get(id=1)
 
@@ -195,18 +196,48 @@ def site_an(request):
             units_15 = ((Decimal(y) / Decimal(first_cloud.volume)) * 2) * (60 / Decimal(c)) * 15
             if units_15 <= first_qty:
                 ninja_isk = units_15 * first_cloud.last_price
+                if ninja_isk > site_isk:
+                    ninja_isk = site_isk
+                m_per_s = (units_15 / num) * first_cloud.volume
+
             #if it is more than the qty in the best cloud, calculate the remaining time
             if units_15 > first_qty:
                 min_left = 15 - (first_qty / (units_15 / 15))
                 sec_units_min = ((Decimal(y) / Decimal(sec_cloud.volume)) * 2) * (60 / Decimal(c))
                 rem_units = sec_units_min * min_left
                 ninja_isk = (rem_units * sec_cloud.last_price) + (first_qty * first_cloud.last_price)
+                if ninja_isk > site_isk:
+                    ninja_isk = site_isk
+                m_per_s = ((units_15 / num) * first_cloud.volume) + ((rem_units / num) * sec_cloud.volume)
+                if m_per_s * num > (site.p_qty * site.p_gas.volume) + (site.s_qty * site.s_gas.volume):
+                    m_per_s = ((site.p_qty * site.p_gas.volume) + (site.s_qty * site.s_gas.volume)) / num
 
-            ninja_si = (site_name, site_isk, ninja_isk, first_cloud.name)
+            sipm = ninja_isk / 15 / num
+            nips = ninja_isk / num
+            ninja_si = (site_name, site_isk, sipm, first_cloud.name, m_per_s, nips, ninja_isk)
+            #print(ninja_si)
             proc_sites.append(ninja_si)
 
+    t_site_isk = 0
+    t_sipm = 0
+    t_sipm_c = 0
+    t_m_per_s = 0
+    t_nips = 0
+    t_ninja_isk = 0
+    for s in proc_sites:
+        t_site_isk = t_site_isk + s[1]
+        t_sipm = t_sipm + s[2]
+        t_sipm_c = t_sipm_c + 1
+        t_m_per_s = t_m_per_s + s[4]
+        t_nips = t_nips + s[5]
+        t_ninja_isk = t_ninja_isk + s[6]
+
+    ships = t_m_per_s / ship.cargo
+    if t_sipm_c == 0:
+        t_sipm_c = 1
+    totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships)
     #site clearing
-    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites}
+    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites, 'totals': totals}
     return render(request, "home/site_an.html", context)
 
 def pull_prices(request):
