@@ -245,7 +245,8 @@ def site_an(request):
     ships = t_m_per_s / ship.cargo
     if t_sipm_c == 0:
         t_sipm_c = 1
-    totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships)
+    percent = t_ninja_isk / t_site_isk
+    totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships, percent)
     t_min = t_sipm_c * 15
     u = APICheck.objects.get(id=1)
     #site clearing
