@@ -237,7 +237,8 @@ def site_an(request):
     for s in proc_sites:
         t_site_isk = t_site_isk + s[1]
         t_sipm = t_sipm + s[2]
-        t_sipm_c = t_sipm_c + 1
+        if s[0] != "Ordinary Perimeter Reservoir":
+            t_sipm_c = t_sipm_c + 1
         t_m_per_s = t_m_per_s + s[4]
         t_nips = t_nips + s[5]
         t_ninja_isk = t_ninja_isk + s[6]

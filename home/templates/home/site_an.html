@@ -59,7 +59,11 @@
       <th class="text-center">Isk Collected</th>
     </tr>
   {% for s in proc_sites %}
+    {% if s.0 == "Ordinary Perimeter Reservoir" %}
+    <tr class="danger">
+    {% else %}
     <tr>
+    {% endif %}
       <td>{{s.0}}</td>
       <td>{{s.1|floatformat:2|intcomma}}</td>
       <td>{{s.5|floatformat:2|intcomma}}</td>

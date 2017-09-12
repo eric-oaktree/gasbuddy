@@ -70,7 +70,11 @@
   </thead>
   <tbody>
     {% for key, list in sites_calc.items %}
+    {% if key == "Ordinary Perimeter Reservoir" %}
+    <tr class="danger">
+    {% else %}
     <tr>
+    {% endif %}
       <td>{{key}}</td>
       <td>{{list.0|floatformat:2|intcomma}}</td>
       <td>{{list.1.name}}</td>
