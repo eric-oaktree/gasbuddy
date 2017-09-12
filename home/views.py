@@ -241,8 +241,9 @@ def site_an(request):
     if t_sipm_c == 0:
         t_sipm_c = 1
     totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships)
+    t_min = t_sipm_c * 15
     #site clearing
-    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites, 'totals': totals}
+    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites, 'totals': totals, 't_min': t_min}
     return render(request, "home/site_an.html", context)
 
 def pull_prices(request):
