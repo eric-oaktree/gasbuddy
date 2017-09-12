@@ -8,7 +8,7 @@ from decimal import *
 
 # Create your views here.
 from .models import Gas, Region, Station, Site, Ship, Harvester, Setup, APICheck
-from .forms import GasForm, SiteForm
+from .forms import GasForm, SiteForm, SiteAnalyzer
 
 def about(request):
     return render(request, 'home/about.html')
@@ -66,6 +66,7 @@ def sites(request):
             yld = Decimal(harv.yld)
             ship = data['ship']
             yld_bonus = Decimal(ship.yld_bonus)
+            cargo = Decimal(ship.cargo)
             num = Decimal(data['num'])
             if data['skill'] > 5:
                 skill = 5
@@ -74,6 +75,8 @@ def sites(request):
             else:
                 skill = data['skill']
             cycle_bonus = skill * .05
+
+            extra_data = data['extra_data']
 
 
 
@@ -84,6 +87,8 @@ def sites(request):
         cycle_bonus = Decimal(0.25)
         yld_bonus = Decimal(1)
         num = Decimal(1)
+        cargo = 10000
+        extra_data = False
 
     c = cycle * (Decimal(1) - Decimal(cycle_bonus))
     y = yld * (Decimal(1) + Decimal(yld_bonus))
@@ -102,29 +107,140 @@ def sites(request):
         if p_isk_min < s_isk_min:
             best_gas = site.s_gas
             best_gas_isk_min = s_isk_min
+            best_qty = site.s_qty
             other_gas = site.p_gas
             other_gas_isk_min = p_isk_min
+            other_qty = site.p_qty
         else:
             best_gas = site.p_gas
             best_gas_isk_min = p_isk_min
+            best_qty = site.p_qty
             other_gas = site.s_gas
             other_gas_isk_min = s_isk_min
+            other_qty = site.s_qty
 
-        p_units_min = ((y / p_vol) * 2) * (60 / c) * num
-        s_units_min = ((y / s_vol) * 2) * (60 / c) * num
-        time_to_clear = (site.p_qty / p_units_min) + (site.s_qty / s_units_min)
+        p_units_min = ((y / best_gas.volume) * 2) * (60 / c) * num
+        s_units_min = ((y / other_gas.volume) * 2) * (60 / c) * num
+        time_to_clear = (best_qty / p_units_min) + (other_qty / s_units_min)
         isk_pres = (p_price * site.p_qty) + (s_price * site.s_qty)
 
         site_isk_min = Decimal(isk_pres) / Decimal(time_to_clear)
 
-        sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear]
+        #extra data calculations
+        primary_time_to_clear = (best_qty / p_units_min)
+        secondary_time_to_clear = (other_qty / s_units_min)
+        #blue_loot_isk
+        #time to kill site
+        ships_needed = ((site.p_qty * p_vol) + (site.s_qty * s_vol)) / (cargo)
+
+        sites_calc[site.name] = [isk_pres, best_gas, best_gas_isk_min, other_gas, other_gas_isk_min, site_isk_min, time_to_clear, primary_time_to_clear, secondary_time_to_clear, ships_needed]
 
     u = APICheck.objects.get(id=1)
-    context = {'form': form, 'sites_calc': sites_calc, 'updated': str(u.updated)}
+    context = {'form': form, 'sites_calc': sites_calc, 'updated': str(u.updated), 'extra_data': extra_data}
     return render(request, "home/sites.html", context)
 
 def site_an(request):
-    return render(request, "home/site_an.html")
+    if request.method == 'POST':
+        form = SiteAnalyzer(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            scan = data['scan']
+            num = Decimal(data['num'])
+            ship = data['ship']
+            harvester = data['harvester']
+            skill = Decimal(data['skill'])
+            show_data = True
+    else:
+        form = SiteAnalyzer()
+        show_data = False
+        skill = 0
+        yld = 0
+        num = 1
+        ship = Ship.objects.get(id=1)
+        harvester = Harvester.objects.get(id=1)
+
+    cycle_bonus = skill * Decimal(0.05)
+    yld = harvester.yld
+    c = harvester.cycle * (1 - cycle_bonus)
+    y = yld * (1 + ship.yld_bonus) * num
+    #parse Dscan
+    sites = []
+    proc_sites = []
+    if show_data == True:
+        #print(scan)
+        scan_re = re.compile(r'Gas Site	*(\S* \S* \S*)	*')
+        scan_results = scan_re.findall(scan)
+        #print(scan_results)
+        for res in scan_results:
+            sites.append(res)
+
+
+        for s in sites:
+            site = Site.objects.get(name=s)
+            site_name = site.name
+            site_isk = (site.p_gas.last_price * site.p_qty) + (site.s_gas.last_price * site.s_qty)
+
+            #ninja scanning
+            #determine best gas
+            p_isk_min = ((Decimal(y) / Decimal(site.p_gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(site.p_gas.last_price)
+            s_isk_min = ((Decimal(y) / Decimal(site.s_gas.volume)) * 2) * (60 / Decimal(c)) * Decimal(site.s_gas.last_price)
+            if p_isk_min >= s_isk_min:
+                first_cloud = site.p_gas
+                first_qty = site.p_qty
+                sec_cloud = site.s_gas
+                sec_qty = site.s_qty
+            if p_isk_min <= s_isk_min:
+                first_cloud = site.s_gas
+                first_qty = site.s_qty
+                sec_cloud = site.p_gas
+                sec_qty = site.p_qty
+            #calculate how much you can get in 15 minutes
+            units_15 = ((Decimal(y) / Decimal(first_cloud.volume)) * 2) * (60 / Decimal(c)) * 15
+            if units_15 <= first_qty:
+                ninja_isk = units_15 * first_cloud.last_price
+                if ninja_isk > site_isk:
+                    ninja_isk = site_isk
+                m_per_s = (units_15 / num) * first_cloud.volume
+
+            #if it is more than the qty in the best cloud, calculate the remaining time
+            if units_15 > first_qty:
+                min_left = 15 - (first_qty / (units_15 / 15))
+                sec_units_min = ((Decimal(y) / Decimal(sec_cloud.volume)) * 2) * (60 / Decimal(c))
+                rem_units = sec_units_min * min_left
+                ninja_isk = (rem_units * sec_cloud.last_price) + (first_qty * first_cloud.last_price)
+                if ninja_isk > site_isk:
+                    ninja_isk = site_isk
+                m_per_s = ((units_15 / num) * first_cloud.volume) + ((rem_units / num) * sec_cloud.volume)
+                if m_per_s * num > (site.p_qty * site.p_gas.volume) + (site.s_qty * site.s_gas.volume):
+                    m_per_s = ((site.p_qty * site.p_gas.volume) + (site.s_qty * site.s_gas.volume)) / num
+
+            sipm = ninja_isk / 15 / num
+            nips = ninja_isk / num
+            ninja_si = (site_name, site_isk, sipm, first_cloud.name, m_per_s, nips, ninja_isk)
+            #print(ninja_si)
+            proc_sites.append(ninja_si)
+
+    t_site_isk = 0
+    t_sipm = 0
+    t_sipm_c = 0
+    t_m_per_s = 0
+    t_nips = 0
+    t_ninja_isk = 0
+    for s in proc_sites:
+        t_site_isk = t_site_isk + s[1]
+        t_sipm = t_sipm + s[2]
+        t_sipm_c = t_sipm_c + 1
+        t_m_per_s = t_m_per_s + s[4]
+        t_nips = t_nips + s[5]
+        t_ninja_isk = t_ninja_isk + s[6]
+
+    ships = t_m_per_s / ship.cargo
+    if t_sipm_c == 0:
+        t_sipm_c = 1
+    totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships)
+    #site clearing
+    context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites, 'totals': totals}
+    return render(request, "home/site_an.html", context)
 
 def pull_prices(request):
     tag_re = re.compile(r'<.*>(.*)</.*>')
