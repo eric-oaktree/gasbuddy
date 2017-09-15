@@ -252,7 +252,12 @@ def site_an(request):
     totals = (t_site_isk, t_sipm / t_sipm_c, t_m_per_s, t_nips, t_ninja_isk, ships, percent)
     t_min = t_sipm_c * 15
     u = APICheck.objects.get(id=1)
+
     #site clearing
+
+    #take sites
+    #isk present, blue loot isk present, time to fully clear site, rat dps, rat ehp 
+
     context = {'show_data': show_data, 'form': form, 'sites': sites, 'proc_sites': proc_sites, 'totals': totals, 't_min': t_min, 'updated': str(u.updated)}
     return render(request, "home/site_an.html", context)
 
